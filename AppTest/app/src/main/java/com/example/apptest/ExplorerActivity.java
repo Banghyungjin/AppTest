@@ -8,6 +8,7 @@ import android.app.ActivityManager;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +28,7 @@ public class ExplorerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.explorer_layout);
+
         final Button button_1 = findViewById(R.id.button_1);
         final Button button_2 = findViewById(R.id.button_2);
         final Button button_3 = findViewById(R.id.button_3);
@@ -39,15 +42,7 @@ public class ExplorerActivity extends AppCompatActivity {
 
             }
         });
-        final ListView listView = findViewById(R.id.listView);
-        final TextAdapter textAdapter1 = new TextAdapter();
-        listView.setAdapter(textAdapter1);
 
-        List<String> example = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            example.add(String.valueOf(i));
-        }
-        textAdapter1.setData(example);
     }
 
     class TextAdapter extends BaseAdapter{
@@ -120,26 +115,50 @@ public class ExplorerActivity extends AppCompatActivity {
         return false;
     }
 
+    private boolean isFileManagerInitialized = false;
+
     @Override
     protected void onResume() {
         super.onResume();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (arePermissionsDenied()) {
-                requestPermissions(PERMISSIONS, REQUEST_PERMISSIONS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && arePermissionsDenied()) {
+            requestPermissions(PERMISSIONS, REQUEST_PERMISSIONS);
+            return;
+        }
+        if (!isFileManagerInitialized) {
+
+            String rootPath = String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
+
+            final File dir = new File(rootPath);
+            final File[] files = dir.listFiles();
+            final TextView pathOutput = findViewById(R.id.pathOutput);
+            pathOutput.setText(rootPath);
+            final int filesFoundCount = files.length;
+            final ListView listView = findViewById(R.id.listView);
+            final TextAdapter textAdapter1 = new TextAdapter();
+            listView.setAdapter(textAdapter1);
+
+            List<String> filesList = new ArrayList<>();
+            for (int i = 0; i < filesFoundCount; i++) {
+                filesList.add(String.valueOf(files[i].getAbsolutePath()));
             }
+            textAdapter1.setData(filesList);
+            isFileManagerInitialized = true;
         }
     }
+
+
     @SuppressLint("NewApi")
     @Override
-    public void onRequestPermissionsResult(final int requestCode,
-                                           final String[] permissions, final int[] grantResults) {
+    public void onRequestPermissionsResult(final int requestCode, final String[] permissions, final int[] grantResults) {
         super.onRequestPermissionsResult(requestCode,permissions,grantResults);
         if (requestCode == REQUEST_PERMISSIONS && grantResults.length > 0) {
             if(arePermissionsDenied()) {
                 ((ActivityManager) Objects.requireNonNull(this.getSystemService(ACTIVITY_SERVICE))).clearApplicationUserData();
                 recreate();
             }
+            else{
+                onResume();
+            }
         }
     }
-
 }
