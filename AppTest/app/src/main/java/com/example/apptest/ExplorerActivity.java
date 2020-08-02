@@ -82,7 +82,7 @@ public class ExplorerActivity extends AppCompatActivity {
             }
             ViewHolder holder = (ViewHolder) convertView.getTag();
             final String itemPath = getItem(position);
-            holder.info.setText(itemPath);
+            holder.info.setText(itemPath.substring(itemPath.lastIndexOf('/')+1));
             return convertView;
         }
 
@@ -131,7 +131,8 @@ public class ExplorerActivity extends AppCompatActivity {
             final File dir = new File(rootPath);
             final File[] files = dir.listFiles();
             final TextView pathOutput = findViewById(R.id.pathOutput);
-            pathOutput.setText(rootPath);
+            pathOutput.setText("Now at : " + rootPath.substring(rootPath.lastIndexOf('/')+1));
+
             final int filesFoundCount = files.length;
             final ListView listView = findViewById(R.id.listView);
             final TextAdapter textAdapter1 = new TextAdapter();
