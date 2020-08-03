@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
@@ -13,8 +16,10 @@ import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -30,19 +35,7 @@ public class ExplorerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.explorer_layout);
 
-        final Button button_1 = findViewById(R.id.button_1);
-        final Button button_2 = findViewById(R.id.button_2);
-        final Button button_3 = findViewById(R.id.button_3);
-        final Button button_4 = findViewById(R.id.button_4);
-        final Button button_5 = findViewById(R.id.button_5);
 
-        button_1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                button_1.setText("pressed");
-
-            }
-        });
 
     }
 
@@ -127,7 +120,7 @@ public class ExplorerActivity extends AppCompatActivity {
             holder.info.setText(itemPath.substring(itemPath.lastIndexOf('/')+1));
             if(selection != null) {
                 if (selection[position]) {
-                    holder.info.setBackgroundColor(Color.GRAY);
+                    holder.info.setBackgroundColor(Color.argb(20,8,8,8));
                 }
                 else {
                     holder.info.setBackgroundColor(Color.WHITE);
@@ -167,6 +160,9 @@ public class ExplorerActivity extends AppCompatActivity {
 
     private boolean isFileManagerInitialized = false;
     private boolean[] selection;
+    private File[] files;
+    private List<String> filesList;
+    private int filesFoundCount;
 
     @Override
     protected void onResume() {
@@ -180,24 +176,112 @@ public class ExplorerActivity extends AppCompatActivity {
             String rootPath = String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
 
             final File dir = new File(rootPath);
-            final File[] files = dir.listFiles();
+            files = dir.listFiles();
             final TextView pathOutput = findViewById(R.id.pathOutput);
             pathOutput.setText("Now at : " + rootPath.substring(rootPath.lastIndexOf('/')+1));
 
-            final int filesFoundCount = files.length;
+            filesFoundCount = files.length;
             final ListView listView = findViewById(R.id.listView);
             final TextAdapter textAdapter1 = new TextAdapter();
             listView.setAdapter(textAdapter1);
 
-            List<String> filesList = new ArrayList<>();
+            filesList = new ArrayList<>();
             for (int i = 0; i < filesFoundCount; i++) {
                 filesList.add(String.valueOf(files[i].getAbsolutePath()));
             }
             textAdapter1.setData(filesList);
+
+            selection = new boolean[files.length];
+
+            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int index, long l) {
+                    selection[index] = !selection[index];
+                    textAdapter1.setSelection(selection);
+
+                    boolean isAtLeastOneSelected = false;
+                    for(int i = 0; i < selection.length; i++) {
+                        if (selection[i]) {
+                            isAtLeastOneSelected = true;
+                            break;
+                        }
+                    }
+                    if (isAtLeastOneSelected) {
+                        findViewById(R.id.bottomBar).setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        findViewById(R.id.bottomBar).setVisibility(View.GONE);
+                    }
+                    return false;
+                }
+            });
+
+            final Button button_1 = findViewById(R.id.button_1);
+            final Button deleteButton = findViewById(R.id.delete);
+            final Button button_3 = findViewById(R.id.button_3);
+            final Button button_4 = findViewById(R.id.button_4);
+            final Button button_5 = findViewById(R.id.button_5);
+
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(ExplorerActivity.this);
+                    deleteDialog.setTitle("Delete Confirmation");
+                    deleteDialog.setMessage("Are you sure to delete this file?");
+                    deleteDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int index) {
+                            for(int i = 0; i < files.length;i++) {
+                                if (selection[i]) {
+                                    deleteFileOrFolder(files[i]);
+                                    for (int j = 0; j < files.length;j++) {
+                                        selection[j] = false;
+                                    }
+                                }
+                            }
+                            files = dir.listFiles();
+                            filesFoundCount = files.length;
+                            filesList.clear();
+                            for (int i = 0; i < filesFoundCount; i++) {
+                                filesList.add(String.valueOf(files[i].getAbsolutePath()));
+                            }
+                            textAdapter1.setData(filesList);
+                        }
+                    });
+                    deleteDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int index) {
+                            dialogInterface.cancel();
+                        }
+                    });
+                    deleteDialog.show();
+                }
+            });
+
             isFileManagerInitialized = true;
         }
     }
 
+    private void deleteFileOrFolder(File fileOrFolder) {
+        if (fileOrFolder.isDirectory()) {
+            if (fileOrFolder.list().length == 0) {
+                fileOrFolder.delete();
+            }
+            else {
+                String files[] = fileOrFolder.list();
+                for(String temp:files) {
+                    File fileToDelete = new File(fileOrFolder, temp);
+                    deleteFileOrFolder(fileToDelete);
+                }
+                if (fileOrFolder.list().length == 0) {
+                    fileOrFolder.delete();
+                }
+            }
+        }
+        else {
+            fileOrFolder.delete();
+        }
+    }
 
     @SuppressLint("NewApi")
     @Override

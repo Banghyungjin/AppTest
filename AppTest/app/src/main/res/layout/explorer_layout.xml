@@ -30,6 +30,8 @@
         android:layout_weight="1"/>
 
     <LinearLayout
+        android:id="@+id/bottomBar"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal">
@@ -39,7 +41,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1" />
         <Button
-            android:id="@+id/button_2"
+            android:text="DEL"
+            android:id="@+id/delete"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1" />
