@@ -50,11 +50,23 @@ public class ExplorerActivity extends AppCompatActivity {
 
         private List<String> data = new ArrayList<>();
 
+        private boolean[] selection;
+
         public void setData(List<String> data) {
             if (data != null) {
                 this.data.clear();
                 if(data.size() > 0) {
                     this.data.addAll(data);
+                }
+                notifyDataSetChanged();
+            }
+        }
+
+        void setSelection(boolean[] selection) {
+            if(selection != null) {
+                this.selection = new boolean[selection.length];
+                for(int i = 0; i < selection.length; i++) {
+                    this.selection[i] = selection[i];
                 }
                 notifyDataSetChanged();
             }
@@ -113,8 +125,14 @@ public class ExplorerActivity extends AppCompatActivity {
                 holder.info.setTextColor(Color.BLACK);
             }
             holder.info.setText(itemPath.substring(itemPath.lastIndexOf('/')+1));
-            /*
-            */
+            if(selection != null) {
+                if (selection[position]) {
+                    holder.info.setBackgroundColor(Color.GRAY);
+                }
+                else {
+                    holder.info.setBackgroundColor(Color.WHITE);
+                }
+            }
             return convertView;
         }
 
@@ -148,6 +166,7 @@ public class ExplorerActivity extends AppCompatActivity {
     }
 
     private boolean isFileManagerInitialized = false;
+    private boolean[] selection;
 
     @Override
     protected void onResume() {
