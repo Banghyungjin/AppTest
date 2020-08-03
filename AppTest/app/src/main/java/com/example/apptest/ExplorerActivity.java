@@ -6,6 +6,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -74,6 +75,7 @@ public class ExplorerActivity extends AppCompatActivity {
             return 0;
         }
 
+        @SuppressLint("ResourceAsColor")
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
@@ -82,7 +84,37 @@ public class ExplorerActivity extends AppCompatActivity {
             }
             ViewHolder holder = (ViewHolder) convertView.getTag();
             final String itemPath = getItem(position);
+            if (itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("ppt") ||
+                    itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("pptx")) {
+                holder.info.setTextColor(Color.RED);
+            }
+            else if (itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("word") ||
+                    itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("doc") ||
+                    itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("docx") ||
+                    itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("hwp")) {
+                holder.info.setTextColor(Color.BLUE);
+            }
+            else if (itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("png") ||
+                    itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("jpg") ||
+                    itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("jpeg") ||
+                    itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("bmp")) {
+                holder.info.setTextColor(Color.rgb(100,0,200));
+            }
+            else if (itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("pdf")) {
+                holder.info.setTextColor(Color.rgb(255,165,0));
+            }
+            else if (itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("apk")) {
+                holder.info.setTextColor(Color.GREEN);
+            }
+            else if (itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("gif")) {
+                holder.info.setTextColor(Color.MAGENTA);
+            }
+            else {
+                holder.info.setTextColor(Color.BLACK);
+            }
             holder.info.setText(itemPath.substring(itemPath.lastIndexOf('/')+1));
+            /*
+            */
             return convertView;
         }
 
