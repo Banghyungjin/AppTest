@@ -92,13 +92,13 @@ public class ExplorerActivity extends AppCompatActivity {
                     itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("doc") ||
                     itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("docx") ||
                     itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("hwp")) {
-                holder.info.setTextColor(Color.BLUE);
+                holder.info.setTextColor(Color.rgb(24,104,195));
             }
             else if (itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("png") ||
                     itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("jpg") ||
                     itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("jpeg") ||
                     itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("bmp")) {
-                holder.info.setTextColor(Color.rgb(100,0,200));
+                holder.info.setTextColor(Color.rgb(98,69,149));
             }
             else if (itemPath.substring(itemPath.lastIndexOf('.')+1).equalsIgnoreCase("pdf")) {
                 holder.info.setTextColor(Color.rgb(255,165,0));
