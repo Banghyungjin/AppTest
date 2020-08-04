@@ -35,8 +35,6 @@ public class ExplorerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.explorer_layout);
 
-
-
     }
 
     class TextAdapter extends BaseAdapter{
@@ -237,6 +235,7 @@ public class ExplorerActivity extends AppCompatActivity {
                                     for (int j = 0; j < files.length;j++) {
                                         selection[j] = false;
                                     }
+                                    textAdapter1.setSelection(selection);
                                 }
                             }
                             files = dir.listFiles();
