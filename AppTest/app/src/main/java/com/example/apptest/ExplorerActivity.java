@@ -236,6 +236,7 @@ public class ExplorerActivity extends AppCompatActivity {
                                         selection[j] = false;
                                     }
                                     textAdapter1.setSelection(selection);
+                                    findViewById(R.id.bottomBar).setVisibility(View.GONE);
                                 }
                             }
                             files = dir.listFiles();
