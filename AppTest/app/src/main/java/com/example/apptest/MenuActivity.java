@@ -26,7 +26,7 @@ public class MenuActivity extends AppCompatActivity {
         mapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"Sorry I'm still working on it",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Sorry I'm still working on it",Toast.LENGTH_SHORT).show();
             }
         });
     }

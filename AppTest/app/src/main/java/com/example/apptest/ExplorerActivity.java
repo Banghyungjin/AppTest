@@ -13,15 +13,18 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -171,7 +174,7 @@ public class ExplorerActivity extends AppCompatActivity {
         }
         if (!isFileManagerInitialized) {
 
-            String rootPath = String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
+            final String rootPath = String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
 
             final File dir = new File(rootPath);
             files = dir.listFiles();
@@ -225,16 +228,17 @@ public class ExplorerActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(ExplorerActivity.this);
                     deleteDialog.setTitle("Delete Confirmation");
-                    deleteDialog.setMessage("Are you sure to delete this file?");
+                    deleteDialog.setMessage("Are you sure to delete?");
                     deleteDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int index) {
                             for(int i = 0; i < files.length;i++) {
                                 if (selection[i]) {
                                     deleteFileOrFolder(files[i]);
-                                    for (int j = 0; j < files.length;j++) {
-                                        selection[j] = false;
-                                    }
+                                    selection[i] = false;
+                                    //for (int j = 0; j < files.length;j++) {
+                                    //    selection[j] = false;
+                                    //}
                                     textAdapter1.setSelection(selection);
                                     findViewById(R.id.bottomBar).setVisibility(View.GONE);
                                 }
@@ -255,6 +259,44 @@ public class ExplorerActivity extends AppCompatActivity {
                         }
                     });
                     deleteDialog.show();
+                }
+            });
+
+            final Button createNewFolder = findViewById(R.id.newFolder);
+            createNewFolder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final AlertDialog.Builder newFolderDialog = new AlertDialog.Builder(ExplorerActivity.this);
+                    newFolderDialog.setTitle("New Folder");
+                    final EditText input = new EditText(ExplorerActivity.this);
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    newFolderDialog.setView(input);
+                    newFolderDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int index) {
+                            final File newFolder = new File(rootPath + "/" + input.getText());
+                            if(!newFolder.exists()) {
+                                newFolder.mkdir();
+                                files = dir.listFiles();
+                                filesFoundCount = files.length;
+                                filesList.clear();
+                                for (int i = 0; i < filesFoundCount; i++) {
+                                    filesList.add(String.valueOf(files[i].getAbsolutePath()));
+                                }
+                                textAdapter1.setData(filesList);
+                            }
+                            else {
+                                Toast.makeText(getApplicationContext(),"That folder already exists!",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                    newFolderDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
+                    newFolderDialog.show();
                 }
             });
 
