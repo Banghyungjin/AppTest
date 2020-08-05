@@ -207,21 +207,39 @@ public class ExplorerActivity extends AppCompatActivity {
                             break;
                         }
                     }
+                    /*
                     if (isAtLeastOneSelected) {
                         findViewById(R.id.bottomBar).setVisibility(View.VISIBLE);
                     }
                     else {
                         findViewById(R.id.bottomBar).setVisibility(View.GONE);
-                    }
+                    }*/
                     return false;
                 }
             });
 
-            final Button button_1 = findViewById(R.id.button_1);
+            final Button refreshButton = findViewById(R.id.refresh);
             final Button deleteButton = findViewById(R.id.delete);
             final Button button_3 = findViewById(R.id.button_3);
             final Button button_4 = findViewById(R.id.button_4);
             final Button button_5 = findViewById(R.id.button_5);
+
+            refreshButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    files = dir.listFiles();
+                    filesFoundCount = files.length;
+                    listView.setAdapter(textAdapter1);
+
+                    filesList = new ArrayList<>();
+                    for (int i = 0; i < filesFoundCount; i++) {
+                        filesList.add(String.valueOf(files[i].getAbsolutePath()));
+                    }
+                    textAdapter1.setData(filesList);
+                    selection = new boolean[files.length];
+                    Toast.makeText(getApplicationContext(),"Directory has been refreshed!\nThere are "+ files.length +" files here",Toast.LENGTH_SHORT).show();
+                }
+            });
 
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -236,11 +254,7 @@ public class ExplorerActivity extends AppCompatActivity {
                                 if (selection[i]) {
                                     deleteFileOrFolder(files[i]);
                                     selection[i] = false;
-                                    //for (int j = 0; j < files.length;j++) {
-                                    //    selection[j] = false;
-                                    //}
                                     textAdapter1.setSelection(selection);
-                                    findViewById(R.id.bottomBar).setVisibility(View.GONE);
                                 }
                             }
                             files = dir.listFiles();
@@ -274,7 +288,7 @@ public class ExplorerActivity extends AppCompatActivity {
                     newFolderDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int index) {
-                            final File newFolder = new File(rootPath + "/" + input.getText());
+                            File newFolder = new File(rootPath + "/" + input.getText());
                             if(!newFolder.exists()) {
                                 newFolder.mkdir();
                                 files = dir.listFiles();
